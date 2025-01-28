@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from allauth.account.forms import SignupForm
 from django.contrib.auth.models import Group
 
+from django.core.mail import send_mail                  # Для отправки писем
+
 
 class SignUpForm(UserCreationForm):
     # Расширяем базовую форму, добавляем значимые поля (которые есть в модели User)
@@ -26,11 +28,17 @@ class SignUpForm(UserCreationForm):
 
 class CustomSignupForm(SignupForm):
     """
-    Добавляет нового пользователя в группу common, при успешном заполнении
-    формы регистрации.
+    Добавляет нового пользователя в группу common, при успешном заполнении формы регистрации.
+    Функция send_mail отправляет приветственное письмо получателю recipient_list
     """
     def save(self, request):
-        user = super(CustomSignupForm, self).save(request)  # вызываем это же метод у родителя
-        common_group = Group.objects.get(name='common')      # получаем объект модели группы common
-        common_group.user_set.add(user)                     # возвращаем пользователей группы и добавляем нового
-        return user                                        # возвращаем объект модели User
+        # вызываем этот же метод класса-родителя, чтобы необходимые проверки и сохранение в модель User были выполнены.
+        user = super(CustomSignupForm, self).save(request)
+        common_group = Group.objects.get(name='common')             # получаем объект модели группы common
+        common_group.user_set.add(user)                             # возвращаем пользователей группы и добавляем нового
+
+        send_mail(subject='Добро пожаловать на наш новостной портал',
+                  message=f'{user.username}, Вы успешно зарегистрировались!',
+                  from_email=None,                                   # будет использовано значение DEFAULT_FROM_EMAIL
+                  recipient_list=[user.email], )
+        return user                                                  # возвращаем объект модели User
