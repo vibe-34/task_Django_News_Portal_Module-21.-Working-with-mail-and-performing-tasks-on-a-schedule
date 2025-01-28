@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv  # для защиты личных данных
+
+load_dotenv()  # получить доступ к значениям переменных среды, используя os.environ:
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -161,3 +164,16 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'                        # Аутенти�
 ACCOUNT_EMAIL_VERIFICATION = 'none'                            # Верификация электронной почты не требуется
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'                     # верификация почты обязательна
 ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSignupForm'}  # форма добавляющая юзера в группу, при регистрации
+
+# Настройки почты
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для отправки писем на реальные почтовые адреса
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Для тестирования, печать писем в консоль.
+EMAIL_HOST = 'smtp.yandex.ru'                                # хост почтового сервера
+EMAIL_PORT = 465                                             # порт, на который почтовый сервер принимает письма
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')          # логин пользователя почтового сервера
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')  # пароль пользователя почтового сервера
+EMAIL_USE_TLS = False                                    # необходимость использования TLS (зависит от почтового сервера
+EMAIL_USE_SSL = True                                     # необходимость использования SSL (зависит от почтового сервера
+
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')  # почтовый адрес отправителя по умолчанию
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL')        # адрес отправителя для системных уведомлений (ошибки, сбои и т.д.)
