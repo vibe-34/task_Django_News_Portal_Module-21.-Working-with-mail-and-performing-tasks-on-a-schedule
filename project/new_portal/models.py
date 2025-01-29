@@ -84,6 +84,9 @@ class Comment(models.Model):
 
 
 class Subscription(models.Model):
+    """
+    Класс связывает пользователей с категориями через подписки.
+    """
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,

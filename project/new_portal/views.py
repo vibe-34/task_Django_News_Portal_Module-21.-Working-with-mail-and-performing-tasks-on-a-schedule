@@ -73,22 +73,23 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
     success_url = reverse_lazy('post')
 
 
-@login_required  # для того, что бы представление могли использовать только зарегистрированные пользователи
-@csrf_protect    # будет автоматически проверяться CSRF-токен в получаемых формах
+@login_required               # для того, что бы представление могли использовать только зарегистрированные пользователи
+@csrf_protect                 # будет автоматически проверяться CSRF-токен в получаемых формах
 def subscriptions(request):
-    if request.method == 'POST':
-        category_id = request.POST.get('category_id')
-        category = Category.objects.get(id=category_id)
-        action = request.POST.get('action')
+    # Обработка POST запроса
+    if request.method == 'POST':                         # Проверяем является ли метод запроса POST
+        category_id = request.POST.get('category_id')    # Получаем id категории из POST-запроса
+        category = Category.objects.get(id=category_id)  # Получаем объект категории из базы данных по переданному id.
+        action = request.POST.get('action')              # Извлекаем действие (подписка или отписка)
 
-        if action == 'subscribe':
+        # Управление подписками
+        if action == 'subscribe':    # Если подписка, то создается запись в моделе Subscription связь юзера с категорией
             Subscription.objects.create(user=request.user, category=category)
-        elif action == 'unsubscribe':
-            Subscription.objects.filter(
-                user=request.user,
-                category=category,
-            ).delete()
+        elif action == 'unsubscribe':                     # Если отписка, то удаляется запись
+            Subscription.objects.filter(user=request.user, category=category, ).delete()
 
+    # annotate добавляет доп.поле user_subscribed к каждому объекту категории. Поле будет True если есть подписка
+    # это проверяет Exists (наличие записи в таблице Subscription для текущего пользователя и категории)
     categories_with_subscriptions = Category.objects.annotate(
         user_subscribed=Exists(
             Subscription.objects.filter(
