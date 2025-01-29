@@ -41,6 +41,9 @@
                         {% endif %}
                         <li class="nav-item active"><a class="nav-link" href="{% url 'post_search' %}">Поиск</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'post' %}">Все публикации</a></li>
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" style="color: green" href="{% url 'subscriptions' %}">Оформить подписку</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

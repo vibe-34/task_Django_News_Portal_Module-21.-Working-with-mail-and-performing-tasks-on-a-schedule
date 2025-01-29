@@ -1,9 +1,12 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin  # только для зарегистрированных пользователей
+from django.db.models import Exists, OuterRef
 from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_protect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-
+from django.shortcuts import render
 from .forms import PostForm
-from .models import Post, Author
+from .models import Post, Author, Category, Subscription
 from .filters import PostFilter
 
 
@@ -68,3 +71,30 @@ class PostDelete(PermissionRequiredMixin, DeleteView):
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('post')
+
+
+@login_required  # для того, что бы представление могли использовать только зарегистрированные пользователи
+@csrf_protect    # будет автоматически проверяться CSRF-токен в получаемых формах
+def subscriptions(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+        category = Category.objects.get(id=category_id)
+        action = request.POST.get('action')
+
+        if action == 'subscribe':
+            Subscription.objects.create(user=request.user, category=category)
+        elif action == 'unsubscribe':
+            Subscription.objects.filter(
+                user=request.user,
+                category=category,
+            ).delete()
+
+    categories_with_subscriptions = Category.objects.annotate(
+        user_subscribed=Exists(
+            Subscription.objects.filter(
+                user=request.user,
+                category=OuterRef('pk'),
+            )
+        )
+    ).order_by('name')
+    return render(request, 'email/subscriptions.html', {'categories': categories_with_subscriptions},)
