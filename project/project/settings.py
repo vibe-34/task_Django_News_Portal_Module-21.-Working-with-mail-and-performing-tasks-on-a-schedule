@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # 'allauth.socialaccount.providers.yandex',  # поддержка входа с помощью Yandex
     'allauth.socialaccount.providers.google',    # Пример провайдера Google
+
+    'django_apscheduler',                        # пакет использует указание времени периодического выполнения задач
 ]
 
 SITE_ID = 1
