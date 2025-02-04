@@ -167,6 +167,9 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'                        # Аутенти�
 ACCOUNT_EMAIL_VERIFICATION = 'none'                            # Верификация электронной почты не требуется
 # ACCOUNT_EMAIL_VERIFICATION = 'mandatory'                     # верификация почты обязательна
 ACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSignupForm'}  # форма добавляющая юзера в группу, при регистрации
+# форма добавляющая юзера в группу, при регистрации через провайдера
+SOCIALACCOUNT_FORMS = {'signup': 'accounts.forms.CustomSocialSignupForm'}
+SOCIALACCOUNT_AUTO_SIGNUP = False                              # Что бы класс CustomSocialSignupForm был вызван
 
 # Настройки почты
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для отправки писем на реальные почтовые адреса
